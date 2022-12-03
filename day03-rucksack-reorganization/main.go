@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 	"unicode"
 )
 
@@ -40,11 +41,8 @@ func PartOne(data []string) int {
 	sum := 0
 
 	for _, d := range data {
-		left := d[:len(d)/2]
-		right := d[len(d)/2:]
-
-		setA := set(left)
-		setB := set(right)
+		setA := set(d[:len(d)/2])
+		setB := set(d[len(d)/2:])
 
 		for v := range setB {
 			if setA[v] {
@@ -84,7 +82,7 @@ func readLines(fileName string) []string {
 	lines := []string{}
 
 	for scanner.Scan() {
-		line := scanner.Text()
+		line := strings.Trim(scanner.Text(), " ")
 		lines = append(lines, line)
 	}
 
