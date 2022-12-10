@@ -70,7 +70,7 @@ func ReadFile(name string) string {
 
 // Lines split a string by "\n"
 func Lines(name string) []string {
-	return strings.Split(strings.TrimSpace(name), "\r")
+	return strings.Split(strings.TrimSpace(name), "\r\n")
 }
 
 // Set represents a set data structure
@@ -126,6 +126,9 @@ func Union[T Ordered](a, b set[T]) []T {
 // Abs returns the absolute value of a removing
 // negative if present
 func Abs[T Number](a T) T {
+	if a < 0 {
+		return -a
+	}
 	return a
 }
 
@@ -179,7 +182,7 @@ func ReverseSlice[T any](s []T) []T {
 	return c
 }
 
-// Replace is a convenient util for replacing content of a string
+// Replace is a convenient util for replacing parts of a string
 func Replace(s string, oldnew ...string) string {
 	return strings.NewReplacer(oldnew...).Replace(s)
 }
