@@ -70,7 +70,7 @@ func ReadFile(name string) string {
 
 // Lines split a string by "\n"
 func Lines(name string) []string {
-	return strings.Split(strings.TrimSpace(name), "\r\n")
+	return strings.Split(strings.TrimSpace(name), "\n")
 }
 
 // Set represents a set data structure
@@ -185,4 +185,38 @@ func ReverseSlice[T any](s []T) []T {
 // Replace is a convenient util for replacing parts of a string
 func Replace(s string, oldnew ...string) string {
 	return strings.NewReplacer(oldnew...).Replace(s)
+}
+
+func Map[T any, U any](s []T, fn func(T) U) []U {
+	var m []U
+	for _, v := range s {
+		m = append(m, fn(v))
+	}
+	return m
+}
+
+func Filter[T any](s []T, fn func(T) bool) []T {
+	var m []T
+	for _, v := range s {
+		if fn(v) {
+			m = append(m, v)
+		}
+	}
+	return m
+}
+
+func MapKeys[T Ordered, U any](m map[T]U) []T {
+	var keys []T
+	for k := range m {
+		keys = append(keys, k)
+	}
+	return keys
+}
+
+func MapValues[T Ordered, U any](m map[T]U) []U {
+	var values []U
+	for _, v := range m {
+		values = append(values, v)
+	}
+	return values
 }
