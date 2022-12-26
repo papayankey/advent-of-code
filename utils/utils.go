@@ -9,8 +9,6 @@ import (
 	"golang.org/x/exp/constraints"
 )
 
-type Ordered constraints.Ordered
-
 type Number interface {
 	~int | ~int8 | ~int16 | ~int32 | ~int64 | ~float32 | ~float64
 }
@@ -28,7 +26,7 @@ func Itoa(x int) string {
 }
 
 // Min returns the lesser between x and y
-func Min[T Ordered](x, y T) T {
+func Min[T constraints.Ordered](x, y T) T {
 	if x < y {
 		return x
 	}
@@ -36,7 +34,7 @@ func Min[T Ordered](x, y T) T {
 }
 
 // Max returns the greater between x and y
-func Max[T Ordered](x, y T) T {
+func Max[T constraints.Ordered](x, y T) T {
 	if x > y {
 		return x
 	}
@@ -73,56 +71,6 @@ func Lines(name string) []string {
 	return strings.Split(strings.TrimSpace(name), "\n")
 }
 
-// Set represents a set data structure
-type set[T Ordered] map[T]bool
-
-// Set creates and returns a new set
-func Set[T Ordered](s []T) set[T] {
-	m := set[T]{}
-	for _, v := range s {
-		m[v] = true
-	}
-	return m
-}
-
-// Difference returns a slice of unique member(s) of set a and b
-func Difference[T Ordered](a, b set[T]) []T {
-	out := []T{}
-	for k := range a {
-		if !b[k] {
-			out = append(out, k)
-		}
-	}
-	return out
-}
-
-// Intersection returns a slice of common member(s) of set a and b
-func Intersection[T Ordered](a, b set[T]) []T {
-	out := []T{}
-	for k := range a {
-		if b[k] {
-			out = append(out, k)
-		}
-	}
-	return out
-}
-
-// Union returns a set of all members of setA and setB
-func Union[T Ordered](a, b set[T]) []T {
-	s := set[T]{}
-	for i := range a {
-		s[i] = true
-	}
-	for j := range b {
-		s[j] = true
-	}
-	out := []T{}
-	for k := range s {
-		out = append(out, k)
-	}
-	return out
-}
-
 // Abs returns the absolute value of a removing
 // negative if present
 func Abs[T Number](a T) T {
@@ -156,7 +104,7 @@ func LCM(nums ...int) int {
 }
 
 // Transpose
-func Transpose[T Ordered](d [][]T) [][]T {
+func Transpose[T constraints.Ordered](d [][]T) [][]T {
 	o := [][]T{}
 	cols := len(d[0])
 	rows := len(d)
@@ -205,7 +153,7 @@ func Filter[T any](s []T, fn func(T) bool) []T {
 	return m
 }
 
-func MapKeys[T Ordered, U any](m map[T]U) []T {
+func MapKeys[T constraints.Ordered, U any](m map[T]U) []T {
 	var keys []T
 	for k := range m {
 		keys = append(keys, k)
@@ -213,7 +161,7 @@ func MapKeys[T Ordered, U any](m map[T]U) []T {
 	return keys
 }
 
-func MapValues[T Ordered, U any](m map[T]U) []U {
+func MapValues[T constraints.Ordered, U any](m map[T]U) []U {
 	var values []U
 	for _, v := range m {
 		values = append(values, v)
