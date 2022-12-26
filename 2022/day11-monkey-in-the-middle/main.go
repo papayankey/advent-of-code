@@ -35,11 +35,6 @@ func PartTwo(rounds int, input string) int {
 		divisors = append(divisors, m.Test)
 	}
 
-	LCM := 1
-	for _, div := range divisors {
-		LCM = int((LCM * div) / utils.GCD(LCM, div))
-	}
-
 	for i := 1; i <= rounds; i++ {
 		for current, monkey := range monkeys {
 			for _, old := range monkey.Items {
@@ -49,7 +44,7 @@ func PartTwo(rounds int, input string) int {
 				} else {
 					item = utils.Atoi(monkey.Op[1])
 				}
-				val := Op(monkey.Op[0], old, item) % LCM
+				val := Op(monkey.Op[0], old, item) % utils.LCM(divisors...)
 				var m *Monkey
 				if val%monkey.Test == 0 {
 					m = monkeys[monkey.Decision[true]]
