@@ -168,3 +168,17 @@ func MapValues[T constraints.Ordered, U any](m map[T]U) []U {
 	}
 	return values
 }
+
+// Sign returns the of a number
+// 	0 	if the number is zero
+//	1 	if the number is positive
+//	-1 	if the number is negative
+func Sign(n int) int {
+	if n == 0 {
+		return 0
+	}
+	if n < 0 {
+		return -1
+	}
+	return 1
+}
