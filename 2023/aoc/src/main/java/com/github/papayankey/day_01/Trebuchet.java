@@ -64,7 +64,7 @@ public class Trebuchet {
                     index += 1;
                 }
 
-                calibrationValues.add(Integer.parseInt(digits.get(0) + "" + digits.get(digits.size() - 1)));
+                calibrationValues.add(Integer.parseInt(digits.getFirst() + "" + digits.getLast()));
             }
         } catch (IOException exception) {
             System.out.println(exception.getMessage());
