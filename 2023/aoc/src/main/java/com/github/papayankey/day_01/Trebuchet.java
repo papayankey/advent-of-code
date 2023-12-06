@@ -12,7 +12,7 @@ import com.github.papayankey.InputSource;
 
 public class Trebuchet {
     public static void main(String[] args) {
-        var input = InputSource.load("day_01");
+        var input = InputSource.load("day_01", "input.txt");
 
         // Part One
         var result = partOne(input);

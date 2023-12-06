@@ -7,7 +7,7 @@ public class InputSource {
       throw new IllegalStateException("Utility class");
    }
 
-   public static Path load(String inputDirectory) {
-      return Path.of("aoc", "src", "main", "java", "com", "github", "papayankey", inputDirectory).resolve("input.txt");
+   public static Path load(String inputDirectory, String input) {
+      return Path.of("aoc", "src", "main", "java", "com", "github", "papayankey", inputDirectory).resolve(input);
    }
 }

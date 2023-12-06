@@ -10,7 +10,7 @@ import com.github.papayankey.InputSource;
 
 public class CubeConundrum {
     public static void main(String[] args) {
-        var input = InputSource.load("day_02");
+        var input = InputSource.load("day_02", "input.txt");
 
         // Part One
         var result = partOne(input);
