@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.TreeMap;
+import java.util.stream.IntStream;
 
 public class ScratchCards {
     public static void main(String[] args) {
@@ -81,67 +82,33 @@ public class ScratchCards {
                     }
                 }
 
-                cards.put(cardNumber, new Card(cardNumber, matches));
+                cards.put(cardNumber, new Card(cardNumber, matches, 0));
             }
         } catch (IOException exception) {
             System.out.println(exception.getMessage());
         }
 
         for (Map.Entry<Integer, Card> card : cards.entrySet()) {
-            var match = card.getValue().getMatch();
+            var match = card.getValue().match;
 
-            if (match == 0) {
-                continue;
-            }
+            if (match > 0) {
+                duplicateCard(cards, card, match);
+                var copy = card.getValue().copy;
 
-            addCopy(cards, card, match);
-            var copy = card.getValue().getCopy();
-
-            if (copy > 0) {
-                for (int i = 1; i <= copy; i++) {
-                    addCopy(cards, card, match);
+                if (copy > 0) {
+                    IntStream.rangeClosed(1, copy).forEach(i -> duplicateCard(cards, card, match));
                 }
             }
         }
 
-        int totalCopies = cards.values().stream().mapToInt(Card::getCopy).sum();
-
-        return totalCopies + cards.size();
+        return cards.values().stream().mapToInt(Card::copy).sum() + cards.size();
     }
 
-    private static void addCopy(Map<Integer, Card> cards, Map.Entry<Integer, Card> card, int match) {
-        for (int i = 1; i <= match; i++) {
-            var next = cards.get(card.getKey() + i);
-            next.setCopy(next.getCopy() + 1);
-        }
+    private static void duplicateCard(Map<Integer, Card> cards, Map.Entry<Integer, Card> card, int match) {
+        IntStream.rangeClosed(1, match).forEach(i ->
+                cards.computeIfPresent(card.getKey() + i, (_, c) -> new Card(c.id, c.match, c.copy + 1)));
     }
 
-    private static class Card {
-        private final int id;
-        private final int match;
-        private int copy;
-
-        public Card(int id, int match) {
-            this.id = id;
-            this.match = match;
-            this.copy = 0;
-        }
-
-        public int getMatch() {
-            return match;
-        }
-
-        public int getCopy() {
-            return copy;
-        }
-
-        public void setCopy(int copy) {
-            this.copy = copy;
-        }
-
-        @Override
-        public String toString() {
-            return "Card [id=" + id + ", match=" + match + ", copy=" + copy + "]";
-        }
+    record Card(int id, int match, int copy) {
     }
 }
