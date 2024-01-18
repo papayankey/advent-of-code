@@ -1,4 +1,4 @@
-package com.github.papayankey.day_03;
+package com.github.papayankey.AoC_2023.day_03;
 
 import com.github.papayankey.AoC;
 
@@ -19,14 +19,7 @@ public class GearRatios {
 
     public static int partOne(List<String> lines) {
         var result = 0;
-        String[][] grid = new String[lines.size()][];
-
-
-        var index = 0;
-
-        for (var line : lines) {
-            grid[index++] = line.split("");
-        }
+        String[][] grid = lines.stream().map(line -> line.split("")).toArray(String[][]::new);
 
         for (int row = 0; row < grid.length; row++) {
             var start = -1;

@@ -1,4 +1,4 @@
-package com.github.papayankey.day_04;
+package com.github.papayankey.AoC_2023.day_04;
 
 import com.github.papayankey.AoC;
 
@@ -87,7 +87,7 @@ public class ScratchCards {
                 var copy = card.getValue().copy;
 
                 if (copy > 0) {
-                    IntStream.rangeClosed(1, copy).forEach(i -> duplicateCard(cards, card, match));
+                    IntStream.rangeClosed(1, copy).forEach(_ -> duplicateCard(cards, card, match));
                 }
             }
         }

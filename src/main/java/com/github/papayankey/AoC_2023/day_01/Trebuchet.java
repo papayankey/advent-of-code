@@ -1,4 +1,4 @@
-package com.github.papayankey.day_01;
+package com.github.papayankey.AoC_2023.day_01;
 
 import com.github.papayankey.AoC;
 

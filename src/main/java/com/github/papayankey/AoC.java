@@ -23,7 +23,7 @@ public class AoC {
     }
 
     public static List<String> getInput(int year, int day) {
-        Path path = Path.of(STR."\{year}/aoc/src/main/java/com/github/papayankey/day_0\{day}/input.txt").toAbsolutePath();
+        Path path = Path.of(STR."src/main/java/com/github/papayankey/AoC_\{year}/day_0\{day}/input.txt").toAbsolutePath();
 
         if (Files.exists(path)) {
             return readToList(path);
