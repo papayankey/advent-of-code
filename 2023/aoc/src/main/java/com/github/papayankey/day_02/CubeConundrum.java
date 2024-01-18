@@ -2,85 +2,75 @@ package com.github.papayankey.day_02;
 
 import com.github.papayankey.AoC;
 
-import java.io.IOException;
-import java.nio.file.Path;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Scanner;
 
 public class CubeConundrum {
     public static void main(String[] args) {
-        var input = AoC.getInput(2023, 2);
+        var lines = AoC.getInput(2023, 2);
 
         // Part One
-        var result = partOne(input);
+        var result = partOne(lines);
         System.out.println(result);
 
         // Part Two
-        result = partTwo(input);
+        result = partTwo(lines);
         System.out.println(result);
     }
 
-    private static int partOne(Path inputSource) {
+    private static int partOne(List<String> lines) {
         var maximumCubes = Map.of("red", 12, "green", 13, "blue", 14);
         var result = 0;
 
-        try (var scanner = new Scanner(inputSource)) {
-            while (scanner.hasNextLine()) {
-                var parts = scanner.nextLine().trim().split(":");
-                var gameId = Integer.parseInt(parts[0].trim().split(" ")[1]);
-                var cubes = parts[1].trim().replaceAll("; |, ", ",").split(",");
-                var isValidGame = true;
+        for (var line : lines) {
+            var parts = line.trim().split(":");
+            var gameId = Integer.parseInt(parts[0].trim().split(" ")[1]);
+            var cubes = parts[1].trim().replaceAll("; |, ", ",").split(",");
+            var isValidGame = true;
 
-                for (int i = 0; i < cubes.length; i++) {
-                    var cube = cubes[i].trim().split(" ");
-                    var cubeScore = Integer.parseInt(cube[0]);
-                    var cubeColor = cube[1].trim();
+            for (String s : cubes) {
+                var cube = s.trim().split(" ");
+                var cubeScore = Integer.parseInt(cube[0]);
+                var cubeColor = cube[1].trim();
 
-                    if (cubeScore > maximumCubes.get(cubeColor)) {
-                        isValidGame = false;
-                    }
-                }
-
-                if (isValidGame) {
-                    result += gameId;
+                if (cubeScore > maximumCubes.get(cubeColor)) {
+                    isValidGame = false;
                 }
             }
-        } catch (IOException exception) {
-            System.out.println(exception.getMessage());
+
+            if (isValidGame) {
+                result += gameId;
+            }
         }
 
         return result;
     }
 
-    private static int partTwo(Path inputSource) {
+    private static int partTwo(List<String> lines) {
         var result = 0;
 
-        try (var scanner = new Scanner(inputSource)) {
-            while (scanner.hasNextLine()) {
-                var minimumCubes = new HashMap<String, Integer>();
-                var parts = scanner.nextLine().trim().split(":");
-                var cubes = parts[1].trim().replaceAll("; |, ", ",").split(",");
+        for (var line : lines) {
+            var minimumCubes = new HashMap<String, Integer>();
+            var parts = line.trim().split(":");
+            var cubes = parts[1].trim().replaceAll("; |, ", ",").split(",");
 
-                for (int i = 0; i < cubes.length; i++) {
-                    var cube = cubes[i].trim().split(" ");
-                    var cubeScore = Integer.parseInt(cube[0]);
-                    var cubeColor = cube[1].trim();
+            for (String s : cubes) {
+                var cube = s.trim().split(" ");
+                var cubeScore = Integer.parseInt(cube[0]);
+                var cubeColor = cube[1].trim();
 
-                    if (minimumCubes.containsKey(cubeColor)) {
-                        if (cubeScore > minimumCubes.get(cubeColor)) {
-                            minimumCubes.put(cubeColor, cubeScore);
-                        }
-                    } else {
+                if (minimumCubes.containsKey(cubeColor)) {
+                    if (cubeScore > minimumCubes.get(cubeColor)) {
                         minimumCubes.put(cubeColor, cubeScore);
                     }
+                } else {
+                    minimumCubes.put(cubeColor, cubeScore);
                 }
-
-                var power = minimumCubes.values().stream().reduce(1, (accum, curr) -> accum * curr);
-                result += power;
             }
-        } catch (IOException exception) {
-            System.out.println(exception.getMessage());
+
+            var power = minimumCubes.values().stream().reduce(1, (accum, curr) -> accum * curr);
+            result += power;
         }
 
         return result;

@@ -1,5 +1,6 @@
 package com.github.papayankey;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.net.CookieHandler;
 import java.net.CookieManager;
@@ -11,6 +12,8 @@ import java.net.http.HttpResponse;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
+import java.util.Collections;
+import java.util.List;
 
 public class AoC {
     private static final String SESSION = "";
@@ -19,11 +22,11 @@ public class AoC {
         throw new IllegalStateException("Utility class");
     }
 
-    public static Path getInput(int year, int day) {
+    public static List<String> getInput(int year, int day) {
         Path path = Path.of(STR."\{year}/aoc/src/main/java/com/github/papayankey/day_0\{day}/input.txt").toAbsolutePath();
 
         if (Files.exists(path)) {
-            return path;
+            return readToList(path);
         }
 
         CookieHandler.setDefault(new CookieManager());
@@ -57,6 +60,15 @@ public class AoC {
             }
         }
 
-        return path;
+        return readToList(path);
+    }
+
+    private static List<String> readToList(Path file) {
+        try (BufferedReader reader = Files.newBufferedReader(file)) {
+            return reader.lines().toList();
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
+        return Collections.emptyList();
     }
 }

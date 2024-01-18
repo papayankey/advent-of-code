@@ -10,24 +10,22 @@ import java.util.Scanner;
 
 public class GearRatios {
     public static void main(String[] args) {
-        var input = AoC.getInput(2023, 3);
+        var lines = AoC.getInput(2023, 3);
 
         // Part One
-        var result = partOne(input);
+        var result = partOne(lines);
         System.out.println(result);
     }
 
-    public static int partOne(Path inputSource) {
+    public static int partOne(List<String> lines) {
         var result = 0;
-        String[][] grid = new String[140][];
+        String[][] grid = new String[lines.size()][];
 
-        try (var scanner = new Scanner(inputSource)) {
-            var index = 0;
-            while (scanner.hasNextLine()) {
-                grid[index++] = scanner.nextLine().split("");
-            }
-        } catch (IOException exception) {
-            System.out.println(exception.getMessage());
+
+        var index = 0;
+
+        for (var line : lines) {
+            grid[index++] = line.split("");
         }
 
         for (int row = 0; row < grid.length; row++) {
