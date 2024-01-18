@@ -1,5 +1,7 @@
 package com.github.papayankey.day_01;
 
+import com.github.papayankey.AoC;
+
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -8,11 +10,9 @@ import java.util.Map;
 import java.util.Scanner;
 import java.util.regex.Pattern;
 
-import com.github.papayankey.InputSource;
-
 public class Trebuchet {
     public static void main(String[] args) {
-        var input = InputSource.load("day_01", "input.txt");
+        var input = AoC.getInput(2023, 1);
 
         // Part One
         var result = partOne(input);

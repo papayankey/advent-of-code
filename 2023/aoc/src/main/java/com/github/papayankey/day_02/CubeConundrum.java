@@ -1,16 +1,16 @@
 package com.github.papayankey.day_02;
 
+import com.github.papayankey.AoC;
+
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 
-import com.github.papayankey.InputSource;
-
 public class CubeConundrum {
     public static void main(String[] args) {
-        var input = InputSource.load("day_02", "input.txt");
+        var input = AoC.getInput(2023, 2);
 
         // Part One
         var result = partOne(input);

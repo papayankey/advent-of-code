@@ -1,17 +1,16 @@
 package com.github.papayankey.day_03;
 
+import com.github.papayankey.AoC;
+
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-import com.github.papayankey.InputSource;
-
 public class GearRatios {
     public static void main(String[] args) {
-        // var input = InputSource.load("day_03", "example.txt");
-        var input = InputSource.load("day_03", "input.txt");
+        var input = AoC.getInput(2023, 3);
 
         // Part One
         var result = partOne(input);
@@ -37,7 +36,7 @@ public class GearRatios {
             for (int col = 0; col < grid[row].length; col++) {
                 if (Character.isDigit(grid[row][col].charAt(0))) {
                     digit = (digit * 10) + Integer.parseInt(grid[row][col]);
-                    if (col == 0 || col-1 > -1 && !Character.isDigit(grid[row][col - 1].charAt(0))) {
+                    if (col == 0 || col - 1 > -1 && !Character.isDigit(grid[row][col - 1].charAt(0))) {
                         start = col;
                     }
                     if (col < grid[row].length && col + 1 < grid[row].length

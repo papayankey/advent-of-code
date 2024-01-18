@@ -1,5 +1,7 @@
 package com.github.papayankey.day_04;
 
+import com.github.papayankey.AoC;
+
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.HashMap;
@@ -7,11 +9,9 @@ import java.util.Map;
 import java.util.Scanner;
 import java.util.TreeMap;
 
-import com.github.papayankey.InputSource;
-
 public class ScratchCards {
     public static void main(String[] args) {
-        var input = InputSource.load("day_04", "input.txt");
+        var input = AoC.getInput(2023, 4);
 
         // Part One
         var result = partOne(input);
@@ -117,8 +117,8 @@ public class ScratchCards {
     }
 
     private static class Card {
-        private int id;
-        private int match;
+        private final int id;
+        private final int match;
         private int copy;
 
         public Card(int id, int match) {
