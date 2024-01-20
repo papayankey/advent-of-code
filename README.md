@@ -7,10 +7,10 @@ useful.
 
 ### [2023](https://github.com/papayankey/advent-of-code/tree/main/src/main/java/com/github/papayankey/AoC_2023)
 
-    [1 - Trebuchet](https://github.com/papayankey/advent-of-code/tree/main/src/main/java/com/github/papayankey/AoC_2023/day_01/Trebuchet.java)
-    [2 - CubeConundrum](https://github.com/papayankey/advent-of-code/tree/main/src/main/java/com/github/papayankey/AoC_2023/day_01/CubeConundrum.java)
-    [3 - GearRatios](https://github.com/papayankey/advent-of-code/tree/main/src/main/java/com/github/papayankey/AoC_2023/day_01/GearRatios.java)
-    [4 - ScratchCards](https://github.com/papayankey/advent-of-code/tree/main/src/main/java/com/github/papayankey/AoC_2023/day_01/ScratchCards.java)
+1. [Trebuchet](https://github.com/papayankey/advent-of-code/tree/main/src/main/java/com/github/papayankey/AoC_2023/day_01/Trebuchet.java)
+2. [CubeConundrum](https://github.com/papayankey/advent-of-code/tree/main/src/main/java/com/github/papayankey/AoC_2023/day_01/CubeConundrum.java)
+3. [GearRatios](https://github.com/papayankey/advent-of-code/tree/main/src/main/java/com/github/papayankey/AoC_2023/day_01/GearRatios.java)
+4. [ScratchCards](https://github.com/papayankey/advent-of-code/tree/main/src/main/java/com/github/papayankey/AoC_2023/day_01/ScratchCards.java)
 
 WIP
 
