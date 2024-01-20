@@ -11,29 +11,18 @@ public class Trebuchet {
     public static void main(String[] args) {
         var lines = AoC.getInput(2023, 1);
 
-        // Part One
-        var result = partOne(lines);
-        System.out.println(result);
-
-        // Part Two
-        result = partTwo(lines);
-        System.out.println(result);
+        System.out.println(PartOne(lines));
+        System.out.println(PartTwo(lines));
     }
 
-    public static int partOne(List<String> lines) {
-        var calibrationValues = new ArrayList<Integer>();
-
-        for (var line : lines) {
-            var digits = line.replaceAll("\\D", "");
-            var first = digits.substring(0, 1);
-            var last = digits.substring(digits.length() - 1);
-            calibrationValues.add(Integer.parseInt(first + last));
-        }
-
-        return sum(calibrationValues);
+    public static int PartOne(List<String> lines) {
+        return lines.stream().map(line -> line.replaceAll("\\D", ""))
+                .map(digits -> digits.charAt(0) + digits.substring(digits.length() - 1))
+                .mapToInt(Integer::parseInt)
+                .sum();
     }
 
-    public static int partTwo(List<String> lines) {
+    public static int PartTwo(List<String> lines) {
         var pattern = "1|2|3|4|5|6|7|8|9|one|two|three|four|five|six|seven|eight|nine";
         var calibrationValues = new ArrayList<Integer>();
 
@@ -55,13 +44,9 @@ public class Trebuchet {
                 index += 1;
             }
 
-            calibrationValues.add(Integer.parseInt(digits.getFirst() + "" + digits.getLast()));
+            calibrationValues.add(Integer.parseInt(STR."\{digits.getFirst()}\{digits.getLast()}"));
         }
 
-        return sum(calibrationValues);
-    }
-
-    private static int sum(List<Integer> calibrationValues) {
         return calibrationValues.stream().mapToInt(Integer::intValue).sum();
     }
 }

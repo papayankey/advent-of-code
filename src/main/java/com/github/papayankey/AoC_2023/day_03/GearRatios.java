@@ -2,95 +2,88 @@ package com.github.papayankey.AoC_2023.day_03;
 
 import com.github.papayankey.AoC;
 
-import java.io.IOException;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
+import java.util.Objects;
+import java.util.function.Function;
+import java.util.stream.IntStream;
 
 public class GearRatios {
     public static void main(String[] args) {
         var lines = AoC.getInput(2023, 3);
 
-        // Part One
-        var result = partOne(lines);
-        System.out.println(result);
+        System.out.println(PartOne(getSymbols(lines), getNumbers(lines)));
+        System.out.println(PartTwo(getSymbols(lines), getNumbers(lines)));
     }
 
-    public static int partOne(List<String> lines) {
-        var result = 0;
-        String[][] grid = lines.stream().map(line -> line.split("")).toArray(String[][]::new);
+    static int PartOne(List<Symbol> symbols, List<Number> numbers) {
+        return symbols.stream()
+                .filter(symbol -> symbol.value != '.')
+                .flatMap(symbol -> numbers.stream().filter(symbol::isAdjacentTo).map(Number::value))
+                .mapToInt(Integer::intValue)
+                .sum();
+    }
 
-        for (int row = 0; row < grid.length; row++) {
-            var start = -1;
+    static int PartTwo(List<Symbol> symbols, List<Number> numbers) {
+        return symbols.stream()
+                .filter(symbol -> symbol.value == '*')
+                .map(symbol -> numbers.stream().filter(symbol::isAdjacentTo).toList())
+                .filter(list -> list.size() == 2)
+                .map(list -> list.stream().map(Number::value).reduce(1, (acc, curr) -> acc * curr))
+                .mapToInt(Integer::intValue)
+                .sum();
+    }
+
+    static List<Number> getNumbers(List<String> lines) {
+        var numbers = new ArrayList<Number>();
+        char[][] grid = lines.stream().map(String::toCharArray).toArray(char[][]::new);
+
+        for (int r = 0; r < grid.length; r++) {
             var digit = 0;
-            for (int col = 0; col < grid[row].length; col++) {
-                if (Character.isDigit(grid[row][col].charAt(0))) {
-                    digit = (digit * 10) + Integer.parseInt(grid[row][col]);
-                    if (col == 0 || col - 1 > -1 && !Character.isDigit(grid[row][col - 1].charAt(0))) {
-                        start = col;
-                    }
-                    if (col < grid[row].length && col + 1 < grid[row].length
-                            && !Character.isDigit(grid[row][col + 1].charAt(0))) {
-                        List<String> adjacents = getAdjacents(grid, row, start, col);
-
-                        for (String symbol : adjacents) {
-                            if (symbol.charAt(0) != '.') {
-                                result += digit;
-                            }
-                        }
-                        // resets
-                        start = -1;
-                        digit = 0;
-                    }
+            Position start = null;
+            for (int c = 0; c < grid[r].length; c++) {
+                if (Character.isDigit(grid[r][c])) {
+                    if (Objects.isNull(start)) start = new Position(r, c);
+                    digit = (digit * 10) + grid[r][c] - '0';
+                    continue;
+                }
+                if (Objects.nonNull(start)) {
+                    numbers.add(new Number(digit, start, new Position(r, c - 1)));
+                    // resets
+                    digit = 0;
+                    start = null;
                 }
             }
+            // add possible number at edge of grid
+            if (Objects.nonNull(start)) {
+                numbers.add(new Number(digit, start, new Position(r, grid[r].length - 1)));
+            }
         }
 
-        return result;
+        return numbers;
     }
 
-    private static List<String> getAdjacents(String[][] grid, int row, int start, int end) {
-        var adjacents = new ArrayList<String>();
-        if (start - 1 > -1) {
-            adjacents.add(grid[row][start - 1]);
-            if (row - 1 > -1) {
-                adjacents.add(grid[row - 1][start - 1]);
-            }
-            if (row + 1 < grid.length) {
-                adjacents.add(grid[row + 1][start - 1]);
-            }
-        }
-        if (end + 1 < grid[row].length) {
-            adjacents.add(grid[row][end + 1]);
-            if (row - 1 > -1) {
-                adjacents.add(grid[row - 1][end + 1]);
-            }
-            if (row + 1 < grid.length) {
-                adjacents.add(grid[row + 1][end + 1]);
-            }
-        }
-        for (int y = start; y <= end; y++) {
-            if (row - 1 > -1) {
-                adjacents.add(grid[row - 1][y]);
-            }
-            if (row + 1 < grid.length) {
-                adjacents.add(grid[row + 1][y]);
-            }
-        }
-        return adjacents;
+    static List<Symbol> getSymbols(List<String> lines) {
+        return IntStream.range(0, lines.size()).mapToObj(r ->
+                IntStream.range(0, lines.get(r).length()).mapToObj(c -> !Character.isDigit(lines.get(r).charAt(c)) &&
+                        lines.get(r).charAt(c) != '.' ? new Symbol(lines.get(r).charAt(c), new Position(r, c)) : null
+                ).filter(Objects::nonNull)
+        ).flatMap(Function.identity()).toList();
     }
 
-    public static int partTwo(Path inputSource) {
-        var result = 0;
-        try (var scanner = new Scanner(inputSource)) {
-            while (scanner.hasNextLine()) {
-                var line = scanner.nextLine();
-                System.out.println(line);
-            }
-        } catch (IOException exception) {
-            System.out.println(exception.getMessage());
+    record Position(int x, int y) {
+        public boolean inRange(Position start, Position end) {
+            if (x < start.x - 1 || x > end.x + 1) return false;
+            return y >= start.y - 1 && y <= end.y + 1;
         }
-        return result;
+    }
+
+    record Number(int value, Position start, Position end) {
+    }
+
+    record Symbol(char value, Position position) {
+        public boolean isAdjacentTo(Number number) {
+            return position.inRange(number.start, number.end);
+        }
     }
 }

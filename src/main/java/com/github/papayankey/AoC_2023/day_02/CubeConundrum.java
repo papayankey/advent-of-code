@@ -10,16 +10,11 @@ public class CubeConundrum {
     public static void main(String[] args) {
         var lines = AoC.getInput(2023, 2);
 
-        // Part One
-        var result = partOne(lines);
-        System.out.println(result);
-
-        // Part Two
-        result = partTwo(lines);
-        System.out.println(result);
+        System.out.println(PartOne(lines));
+        System.out.println(PartTwo(lines));
     }
 
-    private static int partOne(List<String> lines) {
+    private static int PartOne(List<String> lines) {
         var maximumCubes = Map.of("red", 12, "green", 13, "blue", 14);
         var result = 0;
 
@@ -47,7 +42,7 @@ public class CubeConundrum {
         return result;
     }
 
-    private static int partTwo(List<String> lines) {
+    private static int PartTwo(List<String> lines) {
         var result = 0;
 
         for (var line : lines) {
