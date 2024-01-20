@@ -2,7 +2,7 @@ Advent of Code is an Advent calendar of small programming puzzles for a variety 
 be solved in any programming language you like.
 
 This repository contains all the source codes of my yearly attempts to crack each problem using Java programming
-language, to strengthen and gain more insight into the Java language for my future self anyone who might find this
+language, to strengthen and gain more insight into the Java language for my future self and anyone who might find this
 useful.
 
 ### [2023](https://github.com/papayankey/advent-of-code/tree/main/src/main/java/com/github/papayankey/AoC_2023)
