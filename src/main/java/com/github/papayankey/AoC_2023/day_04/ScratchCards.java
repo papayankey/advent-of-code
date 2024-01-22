@@ -29,16 +29,11 @@ public class ScratchCards {
                     .collect(Collectors.toMap(Function.identity(), _ -> ""));
 
             var cardPoint = 0;
-            var isFirstMatch = true;
 
             for (String win : winnings) {
                 if (map.containsKey(win)) {
-                    if (isFirstMatch) {
-                        cardPoint += 1;
-                        isFirstMatch = false;
-                    } else {
-                        cardPoint *= 2;
-                    }
+                    if (cardPoint == 0) cardPoint += 1;
+                    else cardPoint *= 2;
                 }
             }
 
