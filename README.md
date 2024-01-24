@@ -13,6 +13,7 @@ useful.
 4. [ScratchCards](https://github.com/papayankey/advent-of-code/tree/main/src/main/java/com/github/papayankey/AoC_2023/day_04/ScratchCards.java)
 5. SeedFertilizer ❌
 6. [WaitForIt](https://github.com/papayankey/advent-of-code/tree/main/src/main/java/com/github/papayankey/AoC_2023/day_06/WaitForIt.java)
+7. [CamelCards](https://github.com/papayankey/advent-of-code/tree/main/src/main/java/com/github/papayankey/AoC_2023/day_07/CamelCards.java)
 
 WIP
 
