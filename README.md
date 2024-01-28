@@ -5,7 +5,7 @@ This repository contains all the source codes of my yearly attempts to crack eac
 language, to strengthen and gain more insight into the Java language for my future self and anyone who might find this
 useful.
 
-### [2023](https://github.com/papayankey/advent-of-code/tree/main/src/main/java/com/github/papayankey/AoC_2023)
+### 2023
 
 1. [Trebuchet](https://github.com/papayankey/advent-of-code/tree/main/src/main/java/com/github/papayankey/AoC_2023/day_01/Trebuchet.java)
 2. [CubeConundrum](https://github.com/papayankey/advent-of-code/tree/main/src/main/java/com/github/papayankey/AoC_2023/day_02/CubeConundrum.java)
@@ -14,8 +14,6 @@ useful.
 5. [SeedFertilizer](https://github.com/papayankey/advent-of-code/tree/main/src/main/java/com/github/papayankey/AoC_2023/day_05/SeedFertilizer.java) (part2 optimization stuck)
 6. [WaitForIt](https://github.com/papayankey/advent-of-code/tree/main/src/main/java/com/github/papayankey/AoC_2023/day_06/WaitForIt.java)
 7. [CamelCards](https://github.com/papayankey/advent-of-code/tree/main/src/main/java/com/github/papayankey/AoC_2023/day_07/CamelCards.java)
+8. [HauntedWasteland](https://github.com/papayankey/advent-of-code/tree/main/src/main/java/com/github/papayankey/AoC_2023/day_08/HauntedWasteland.java)
 
 WIP
-
-
-
