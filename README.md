@@ -15,7 +15,7 @@ useful.
 6. [WaitForIt](https://github.com/papayankey/advent-of-code/tree/main/src/main/java/com/github/papayankey/AoC_2023/day_06/WaitForIt.java)
 7. [CamelCards](https://github.com/papayankey/advent-of-code/tree/main/src/main/java/com/github/papayankey/AoC_2023/day_07/CamelCards.java)
 8. [HauntedWasteland](https://github.com/papayankey/advent-of-code/tree/main/src/main/java/com/github/papayankey/AoC_2023/day_08/HauntedWasteland.java)
-9. [MirageMaintenance](https://github.com/papayankey/advent-of-code/tree/main/src/main/java/com/github/papayankey/AoC_2023/day_09/MirageMaintenance.java)
-10.[PipeMaze](https://github.com/papayankey/advent-of-code/tree/main/src/main/java/com/github/papayankey/AoC_2023/day_10/PipeMaze.java) (part2 wip)
+9. [MirageMaintenance](https://github.com/papayankey/advent-of-code/tree/main/src/main/java/com/github/papayankey/AoC_2023/day_09/MirageMaintenance.java)<br>
+10. [PipeMaze](https://github.com/papayankey/advent-of-code/tree/main/src/main/java/com/github/papayankey/AoC_2023/day_10/PipeMaze.java) (part2 wip)
 
 WIP
