@@ -76,16 +76,16 @@ public class PipeMaze {
                 int r = row + direction.row();
                 int c = col + direction.col();
 
-                if (!inRange(r, c, tiles) || !isPipe(tiles[r][c].symbol())) continue;
+                if (!isValidTile(r, c, tiles) || !isPipe(tiles[r][c].symbol())) continue;
                 char neighborSymbol = tiles[r][c].symbol();
 
-                if (direction.equals(NORTH) && isValidMovement(symbol, neighborSymbol, NORTH)) {
+                if (direction.equals(NORTH) && isValidMovement(neighborSymbol, NORTH)) {
                     neighbors.add(new Tile(neighborSymbol, row - 1, col, distance + 1));
-                } else if (direction.equals(SOUTH) && isValidMovement(symbol, neighborSymbol, SOUTH)) {
+                } else if (direction.equals(SOUTH) && isValidMovement(neighborSymbol, SOUTH)) {
                     neighbors.add(new Tile(neighborSymbol, row + 1, col, distance + 1));
-                } else if (direction.equals(EAST) && isValidMovement(symbol, neighborSymbol, EAST)) {
+                } else if (direction.equals(EAST) && isValidMovement(neighborSymbol, EAST)) {
                     neighbors.add(new Tile(neighborSymbol, row, col + 1, distance + 1));
-                } else if (direction.equals(WEST) && isValidMovement(symbol, neighborSymbol, WEST)) {
+                } else if (direction.equals(WEST) && isValidMovement(neighborSymbol, WEST)) {
                     neighbors.add(new Tile(neighborSymbol, row, col - 1, distance + 1));
                 }
             }
@@ -93,19 +93,12 @@ public class PipeMaze {
             return neighbors;
         }
 
-        private boolean isValidMovement(char current, char neighbor, Direction direction) {
-            var movements = Map.of(
-                    NORTH, List.of("S|LJ", "|7F"),
-                    SOUTH, List.of("S|F7", "|LJ"),
-                    EAST, List.of("S-FL", "-7J"),
-                    WEST, List.of("S-7J", "-FL")
-            );
-            return movements.entrySet().stream()
-                    .anyMatch(move -> move.getKey().equals(direction) && move.getValue().getFirst().contains(String.valueOf(current)) &&
-                            move.getValue().getLast().contains(String.valueOf(neighbor)));
+        private boolean isValidMovement(char neighbor, Direction direction) {
+            var movements = Map.of(NORTH, "|7F", SOUTH, "|LJ", EAST, "-7J", WEST, "-FL");
+            return movements.get(direction).chars().anyMatch(character -> character == neighbor);
         }
 
-        private boolean inRange(int row, int col, Tile[][] tiles) {
+        private boolean isValidTile(int row, int col, Tile[][] tiles) {
             return row >= 0 && row <= tiles.length - 1 && col >= 0 && col <= tiles[0].length - 1;
         }
 
