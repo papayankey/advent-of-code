@@ -1,0 +1,4 @@
+(library
+ (name aoc2024)
+ (modules util)
+ (libraries lwt cohttp cohttp-lwt-unix))
