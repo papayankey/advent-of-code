@@ -5,14 +5,14 @@ let read_file filename =
 ;;
 
 let get_rules input =
-  let tbl = Hashtbl.create 10 in
+  let rule_lookup = Hashtbl.create 10 in
   let lines = String.split_on_char '\n' input in
   List.iter
     (fun line ->
       let k, v = Scanf.sscanf line "%d|%d" (fun l r -> l, r) in
-      Hashtbl.add tbl k v)
+      Hashtbl.add rule_lookup k v)
     lines;
-  tbl
+  rule_lookup
 ;;
 
 let get_pages input =
@@ -24,57 +24,84 @@ let get_pages input =
 let parse_input input =
   let pat = {|\n\n|} in
   let res = Re.split (Re.compile (Re.Pcre.re pat)) (String.trim input) in
-  let tbl = get_rules (List.nth res 0) in
-  let pages = get_pages (List.nth res 1) in
-  tbl, pages
+  let rule_lookup = get_rules (List.nth res 0) in
+  let updates = get_pages (List.nth res 1) in
+  rule_lookup, updates
+;;
+
+exception Invalid_ordering
+
+let sum_middle_page updates =
+  updates
+  |> List.map (fun update -> List.nth update (List.length update / 2))
+  |> List.fold_left ( + ) 0
+;;
+
+let is_valid_update rule_lookup update =
+  let is_valid = ref true
+  and len = Array.length update in
+  (try
+     for j = 0 to len - 2 do
+       let curr_page = update.(j) in
+       if Hashtbl.mem rule_lookup curr_page
+       then (
+         let curr_page_rules = Hashtbl.find_all rule_lookup curr_page in
+         for k = j + 1 to len - 1 do
+           let next = update.(k) in
+           if not (List.mem next curr_page_rules) then raise Invalid_ordering
+         done)
+       else raise Invalid_ordering
+     done
+   with
+   | Invalid_ordering -> is_valid := false);
+  !is_valid
+;;
+
+let get_ordered_updates rule_lookup updates =
+  let ordered_updates = ref [] in
+  Array.iteri
+    (fun i _ ->
+      let update = updates.(i) in
+      if is_valid_update rule_lookup update
+      then ordered_updates := Array.to_list update :: !ordered_updates)
+    updates;
+  List.rev !ordered_updates
 ;;
 
 module Part1 = struct
-  exception Invalid_ordering
-
-  let sum_middle_page_number data =
-    data
-    |> List.map (fun d ->
-      let mid = List.length d / 2 in
-      List.nth d mid)
-    |> List.fold_left ( + ) 0
-  ;;
-
-  let check_valid_ordering tbl is_valid item =
-    let len = Array.length item in
-    try
-      for j = 0 to len - 2 do
-        let curr = item.(j) in
-        if Hashtbl.mem tbl curr
-        then (
-          let assoc = Hashtbl.find_all tbl curr in
-          for k = j + 1 to len - 1 do
-            let next = item.(k) in
-            if not (List.mem next assoc) then raise Invalid_ordering
-          done)
-        else raise Invalid_ordering
-      done
-    with
-    | Invalid_ordering -> is_valid := false
-  ;;
-
-  let get_valid_ordered tbl pages =
-    let res = ref [] in
-    for i = 0 to Array.length pages - 1 do
-      let is_valid = ref true in
-      let item = pages.(i) in
-      check_valid_ordering tbl is_valid item;
-      if !is_valid then res := Array.to_list item :: !res
-    done;
-    List.rev !res
-  ;;
-
   let solve (input : string) =
     let rules, pages = parse_input input in
-    get_valid_ordered rules pages |> sum_middle_page_number |> Printf.printf "%d\n"
+    get_ordered_updates rules pages |> sum_middle_page |> Printf.printf "%d\n"
   ;;
 end
 
-module Part2 = struct end
+module Part2 = struct
+  let get_unordered_updates valid_updates updates =
+    Core.Array.filter updates ~f:(fun update ->
+      not (List.mem (Core.List.of_array update) valid_updates))
+  ;;
+
+  let reorder_invalid_update rule_lookup update =
+    Array.stable_sort
+      (fun a b ->
+        let assoc = Hashtbl.find_all rule_lookup a in
+        if List.mem b assoc then 0 else 1)
+      update;
+    update
+  ;;
+
+  let solve (input : string) =
+    let rule_lookup, updates = parse_input input in
+    let valid_updates = get_ordered_updates rule_lookup updates in
+    let reordered_updates =
+      get_unordered_updates valid_updates updates
+      |> Array.map (reorder_invalid_update rule_lookup)
+      |> Array.map Core.List.of_array
+      |> Core.List.of_array
+    in
+    sum_middle_page reordered_updates |> Printf.printf "%d\n"
+  ;;
+end
 
 let () = read_file "data/prod.txt" |> Part1.solve
+let () = read_file "data/prod.txt" |> Part2.solve
