@@ -1,5 +1,7 @@
-let read_file filename = failwith "Todo"
-let parse_input input = failwith "Todo"
+let read_file filename =
+  let ic = open_in filename in
+  In_channel.input_all ic
+;;
 
 module Grid = struct
   type t = string array
@@ -14,7 +16,7 @@ module Grid = struct
 
   let get_start grid =
     let rec aux row col = function
-      | [] -> -1, 1
+      | [] -> -1, -1
       | hd :: tl ->
         (match String.index_opt hd '^' with
          | None -> aux (row + 1) col tl
@@ -22,15 +24,36 @@ module Grid = struct
     in
     aux 0 0 grid
   ;;
+
+  let is_within_bounds r c grid =
+    let rows, cols = dimension grid in
+    r >= 0 && r < rows && c >= 0 && c < cols
+  ;;
+
+  let is_obstacle grid r c = grid.(r).[c] = '#'
+
+  type direction =
+    | Up
+    | Down
+    | Right
+    | Left
+
+  let get_next_position ~row ~col dir =
+    match dir with
+    | Up -> Some (row - 1, col)
+    | Down -> Some (row + 1, col)
+    | Left -> Some (row, col - 1)
+    | Right -> Some (row, col + 1)
+  ;;
+
+  let change_direction dir =
+    match dir with
+    | Up -> Right
+    | Down -> Left
+    | Left -> Up
+    | Right -> Down
+  ;;
 end
-
-let is_obstacle grid r c = grid.(r).[c] = '#'
-
-type direction =
-  | Up
-  | Down
-  | Right
-  | Left
 
 module Part1 = struct
   let get_distinct pos =
@@ -42,41 +65,30 @@ module Part1 = struct
     aux [] pos
   ;;
 
-  let get_positions grid sr sc =
-    let rows, cols = Grid.dimension grid in
-    let rec aux r c dir acc =
-      if r = 0 || c = 0 || r = rows - 1 || c = cols - 1
-      then acc @ [ r, c ]
-      else (
-        match dir with
-        | Up ->
-          if is_obstacle grid (r - 1) c
-          then aux r c Right acc
-          else aux (r - 1) c dir acc @ [ r, c ]
-        | Right ->
-          if is_obstacle grid r (c + 1)
-          then aux r c Down acc
-          else aux r (c + 1) dir acc @ [ r, c ]
-        | Down ->
-          if is_obstacle grid (r + 1) c
-          then aux r c Left acc
-          else aux (r + 1) c dir acc @ [ r, c ]
-        | Left ->
-          if is_obstacle grid r (c - 1)
-          then aux r c Up acc
-          else aux r (c - 1) dir acc @ [ r, c ])
+  let get_visited_positions grid sr sc dir =
+    let rec aux row col grid dir visited =
+      match Grid.get_next_position ~row ~col dir with
+      | None -> visited
+      | Some (r, c) ->
+        if not (Grid.is_within_bounds r c grid)
+        then visited
+        else if Grid.is_obstacle grid r c
+        then aux row col grid (Grid.change_direction dir) visited
+        else aux r c grid dir ((r, c) :: visited)
     in
-    aux sr sc Up [ sr, sc ]
+    aux sr sc grid dir [ sr, sc ]
   ;;
 
-  let solve () =
-    let grid = Grid.make "" in
-    let sr, sc = Grid.get_start (Array.to_list grid) in
-    let total_distinct_pos = get_positions grid sr sc |> get_distinct |> List.length in
-    Printf.printf "Part1: %d" total_distinct_pos
+  let solve input =
+    let grid = Grid.make input in
+    let start_row, start_col = Grid.get_start (Array.to_list grid)
+    and start_dir = Grid.Up in
+    get_visited_positions grid start_row start_col start_dir
+    |> get_distinct
+    |> List.length
   ;;
 end
 
 module Part2 = struct end
 
-let () = print_endline "day 6"
+let () = read_file "data/test.txt" |> Part1.solve |> Printf.printf "Part1: %d\n"
