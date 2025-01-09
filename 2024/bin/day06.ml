@@ -47,6 +47,15 @@ module Grid = struct
   ;;
 
   let point_to_string point = Printf.printf "(%d, %d)" point.row point.col
+
+  let direction_to_string dir =
+    match dir with
+    | Up -> "up"
+    | Down -> "down"
+    | Right -> "right"
+    | Left -> "left"
+  ;;
+
   let is_obstacle grid r c = List.nth (List.nth grid r) c = Obstacle
 
   let next_position ~row ~col grid dir =
@@ -87,20 +96,20 @@ let get_guard_start grid =
   aux 0 0 grid
 ;;
 
-let get_visited_positions grid sr sc dir =
-  let open Grid in
-  let rec aux row col grid dir visited =
-    match next_position ~row ~col grid dir with
-    | None -> visited
-    | Some (r, c) ->
-      (match is_obstacle grid r c with
-       | true -> aux row col grid (change_direction dir) visited
-       | false -> aux r c grid dir ({ row = r; col = c } :: visited))
-  in
-  aux sr sc grid dir [ { row = sr; col = sc } ]
-;;
-
 module Part1 = struct
+  let get_visited_positions grid sr sc dir =
+    let open Grid in
+    let rec aux row col grid dir visited =
+      match next_position ~row ~col grid dir with
+      | None -> visited
+      | Some (r, c) ->
+        (match is_obstacle grid r c with
+         | true -> aux row col grid (change_direction dir) visited
+         | false -> aux r c grid dir ({ row = r; col = c } :: visited))
+    in
+    aux sr sc grid dir [ { row = sr; col = sc } ]
+  ;;
+
   let get_distinct_positions (pos : Grid.point list) =
     let rec aux acc pos =
       match pos with
@@ -115,17 +124,13 @@ module Part1 = struct
     let grid = Grid.make input in
     let start_point = get_guard_start grid in
     let start_dir = Grid.Up in
-    let res =
-      get_visited_positions grid start_point.row start_point.col start_dir
-      |> get_distinct_positions
-    in
-    List.iter Grid.point_to_string res;
-    List.length res
+    get_visited_positions grid start_point.row start_point.col start_dir
+    |> get_distinct_positions
+    |> List.length
   ;;
 end
 
-(*
-   module Part2 = struct
+module Part2 = struct
   type guard_state =
     | Loop
     | Got_away
@@ -133,8 +138,8 @@ end
   module Point = struct
     type t =
       { row : int
-      ; column : int
-      ; direction : Grid.direction
+      ; col : int
+      ; dir : Grid.direction
       }
 
     let compare = compare
@@ -142,15 +147,39 @@ end
 
   module PointSet = Set.Make (Point)
 
-  let _solve input = failwith "todo"
+  let point_to_string (point : Point.t) =
+    Printf.printf "(%d, %d, %s)" point.row point.col (Grid.direction_to_string point.dir)
+  ;;
+
+  let get_visited_positions grid sr sc dir =
+    let open Grid in
+    let visited = PointSet.empty in
+    let rec aux row col grid dir visited =
+      match next_position ~row ~col grid dir with
+      | None -> visited
+      | Some (r, c) ->
+        (match is_obstacle grid r c with
+         | true -> aux row col grid (change_direction dir) visited
+         | false -> aux r c grid dir (PointSet.add { row = r; col = c; dir } visited))
+    in
+    aux sr sc grid dir (PointSet.add { row = sr; col = sc; dir } visited)
+  ;;
+
+  let count_obstruction grid sr sc dir =
+    let _visited = get_visited_positions grid sr sc dir in
+    let _count = ref 0 in
+    ()
+  ;;
+
+  let solve input =
+    let grid = Grid.make input in
+    let start_point = get_guard_start grid in
+    let start_dir = Grid.Up in
+    let res = get_visited_positions grid start_point.row start_point.col start_dir in
+    List.iter point_to_string (PointSet.elements res);
+    List.length (PointSet.elements res)
+  ;;
 end
-*)
 
 let () = read_file "data/test.txt" |> Part1.solve |> Printf.printf "Part1: %d\n"
-
-(*
-   let () =
-   let _ = read_file "data/test.txt" |> Part2.solve in
-   ()
-   ;;
-*)
+let () = read_file "data/test.txt" |> Part2.solve |> Printf.printf "Part1: %d\n"
