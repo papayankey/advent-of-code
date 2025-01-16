@@ -1,6 +1,6 @@
 let read_file filename =
   let ic = open_in filename in
-  In_channel.input_all ic
+  In_channel.input_all ic |> String.trim
 ;;
 
 module Grid = struct
@@ -17,12 +17,7 @@ module Grid = struct
     | Right
     | Left
 
-  type point =
-    { row : int
-    ; col : int
-    }
-
-  let char_to_cell = function
+  let cell_of_char = function
     | '.' -> Empty
     | '#' -> Obstacle
     | _ -> Guard
@@ -31,7 +26,7 @@ module Grid = struct
   let make input : t =
     let string_list = String.split_on_char '\n' input in
     List.map
-      (fun s -> List.init (String.length s) (fun i -> char_to_cell s.[i]))
+      (fun s -> List.init (String.length s) (fun i -> cell_of_char s.[i]))
       string_list
   ;;
 
@@ -46,14 +41,11 @@ module Grid = struct
     r >= 0 && r < rows && c >= 0 && c < cols
   ;;
 
-  let point_to_string point = Printf.printf "(%d, %d)" point.row point.col
-
-  let direction_to_string dir =
-    match dir with
-    | Up -> "up"
-    | Down -> "down"
-    | Right -> "right"
-    | Left -> "left"
+  let update_grid r c grid cell =
+    List.mapi
+      (fun i row ->
+        if i = r then List.mapi (fun j col -> if j = c then cell else col) row else row)
+      grid
   ;;
 
   let is_obstacle grid r c = List.nth (List.nth grid r) c = Obstacle
@@ -76,6 +68,17 @@ module Grid = struct
     | Left -> Up
     | Right -> Down
   ;;
+
+  module Point = struct
+    type t =
+      { row : int
+      ; col : int
+      }
+
+    let compare = compare
+  end
+
+  module PointSet = Set.Make (Point)
 end
 
 let get_guard_start grid =
@@ -85,7 +88,7 @@ let get_guard_start grid =
     | [] -> false, -1
     | hd :: tl -> if hd = Guard then true, col else found_guard tl (col + 1)
   in
-  let rec aux row col (grid : Grid.t) =
+  let rec aux row col (grid : Grid.t) : Point.t =
     match grid with
     | [] -> { row = -1; col = -1 }
     | hd :: tl ->
@@ -98,26 +101,15 @@ let get_guard_start grid =
 
 module Part1 = struct
   let get_visited_positions grid sr sc dir =
-    let open Grid in
     let rec aux row col grid dir visited =
-      match next_position ~row ~col grid dir with
+      match Grid.next_position ~row ~col grid dir with
       | None -> visited
       | Some (r, c) ->
-        (match is_obstacle grid r c with
-         | true -> aux row col grid (change_direction dir) visited
-         | false -> aux r c grid dir ({ row = r; col = c } :: visited))
+        if Grid.is_obstacle grid r c
+        then aux row col grid (Grid.change_direction dir) visited
+        else aux r c grid dir (Grid.PointSet.add { row = r; col = c } visited)
     in
-    aux sr sc grid dir [ { row = sr; col = sc } ]
-  ;;
-
-  let get_distinct_positions (pos : Grid.point list) =
-    let rec aux acc pos =
-      match pos with
-      | [] -> acc
-      | (_ as hd) :: tl ->
-        if not (List.mem hd acc) then aux (hd :: acc) tl else aux acc tl
-    in
-    aux [] pos
+    aux sr sc grid dir Grid.PointSet.(empty |> add { row = sr; col = sc })
   ;;
 
   let solve input =
@@ -125,16 +117,12 @@ module Part1 = struct
     let start_point = get_guard_start grid in
     let start_dir = Grid.Up in
     get_visited_positions grid start_point.row start_point.col start_dir
-    |> get_distinct_positions
+    |> Grid.PointSet.elements
     |> List.length
   ;;
 end
 
 module Part2 = struct
-  type guard_state =
-    | Loop
-    | Got_away
-
   module Point = struct
     type t =
       { row : int
@@ -142,44 +130,70 @@ module Part2 = struct
       ; dir : Grid.direction
       }
 
-    let compare = compare
+    let compare p1 p2 =
+      let c = compare p1.row p2.row in
+      if c <> 0
+      then c
+      else (
+        let c = compare p1.col p2.col in
+        if c <> 0 then c else compare p1.dir p2.dir)
+    ;;
   end
 
   module PointSet = Set.Make (Point)
 
-  let point_to_string (point : Point.t) =
-    Printf.printf "(%d, %d, %s)" point.row point.col (Grid.direction_to_string point.dir)
-  ;;
-
   let get_visited_positions grid sr sc dir =
-    let open Grid in
-    let visited = PointSet.empty in
     let rec aux row col grid dir visited =
-      match next_position ~row ~col grid dir with
+      match Grid.next_position ~row ~col grid dir with
       | None -> visited
       | Some (r, c) ->
-        (match is_obstacle grid r c with
-         | true -> aux row col grid (change_direction dir) visited
-         | false -> aux r c grid dir (PointSet.add { row = r; col = c; dir } visited))
+        if Grid.is_obstacle grid r c
+        then aux row col grid (Grid.change_direction dir) visited
+        else aux r c grid dir (PointSet.add { row = r; col = c; dir } visited)
     in
-    aux sr sc grid dir (PointSet.add { row = sr; col = sc; dir } visited)
+    aux sr sc grid dir PointSet.(empty |> add { row = sr; col = sc; dir })
   ;;
 
-  let count_obstruction grid sr sc dir =
-    let _visited = get_visited_positions grid sr sc dir in
-    let _count = ref 0 in
-    ()
+  let rec creates_loop g row col dir visited =
+    match Grid.next_position ~row ~col g dir with
+    | None -> false
+    | Some (r, c) ->
+      if PointSet.mem { row = r; col = c; dir } visited
+      then true
+      else if Grid.is_obstacle g r c
+      then creates_loop g row col (Grid.change_direction dir) visited
+      else (
+        let new_visited = PointSet.add { row = r; col = c; dir } visited in
+        creates_loop g r c dir new_visited)
+  ;;
+
+  let count_loops_with_obstructions grid sr sc dir =
+    let visited_positions = get_visited_positions grid sr sc dir in
+    let rec count_loops visited_list placed_positions loop_count =
+      match visited_list with
+      | [] -> loop_count
+      | (pos : Point.t) :: tl ->
+        if Grid.PointSet.mem { row = pos.row; col = pos.col } placed_positions
+        then count_loops tl placed_positions loop_count
+        else (
+          let placed_positions =
+            Grid.PointSet.add { row = pos.row; col = pos.col } placed_positions
+          in
+          let updated_grid = Grid.update_grid pos.row pos.col grid Grid.Obstacle in
+          if creates_loop updated_grid sr sc dir PointSet.empty
+          then count_loops tl placed_positions (loop_count + 1)
+          else count_loops tl placed_positions loop_count)
+    in
+    count_loops (PointSet.elements visited_positions) Grid.PointSet.empty 0
   ;;
 
   let solve input =
     let grid = Grid.make input in
     let start_point = get_guard_start grid in
     let start_dir = Grid.Up in
-    let res = get_visited_positions grid start_point.row start_point.col start_dir in
-    List.iter point_to_string (PointSet.elements res);
-    List.length (PointSet.elements res)
+    count_loops_with_obstructions grid start_point.row start_point.col start_dir
   ;;
 end
 
-let () = read_file "data/test.txt" |> Part1.solve |> Printf.printf "Part1: %d\n"
-let () = read_file "data/test.txt" |> Part2.solve |> Printf.printf "Part1: %d\n"
+let () = read_file "data/prod.txt" |> Part1.solve |> Printf.printf "Part1: %d\n"
+let () = read_file "data/prod.txt" |> Part2.solve |> Printf.printf "Part2: %d\n"
